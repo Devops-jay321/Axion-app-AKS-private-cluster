@@ -4,6 +4,9 @@ variable "vnet_config" {
     location            = string
     resource_group_name = string
     address_space       = list(string)
+    
+
   }))
 }
+
 

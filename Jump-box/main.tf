@@ -41,8 +41,7 @@ resource "azurerm_linux_virtual_machine" "jumpbox" {
               set -e
               curl -sL https://aka.ms/InstallAzureCLIDeb | bash
               az aks install-cli
-              az login --identity
-              az aks get-credentials --resource-group jaydeep_rg2 --name jaydeep-aks-cluster-private --overwrite-existing
+              Az login --identity
               EOF
   )
 }

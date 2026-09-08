@@ -1,12 +1,12 @@
 variable "subscription_id" {
-  type = string
-  default = "9e00a7ac-bf84-4246-8d3d-d785b7f6e78b"  # Replace with your actual subscription ID
+  type    = string
+  default = "9e00a7ac-bf84-4246-8d3d-d785b7f6e78b" # Replace with your actual subscription ID
 }
 variable "rg_name_x" {
-    type = map(object({
-        name = string
-        location = string
-    }))
+  type = map(object({
+    name     = string
+    location = string
+  }))
 
 }
 
@@ -16,6 +16,7 @@ variable "vnet_config_x" {
     location            = string
     resource_group_name = string
     address_space       = list(string)
+
   }))
 }
 
@@ -25,28 +26,35 @@ variable "subnet_config_x" {
     resource_group_name  = string
     virtual_network_name = string
     address_prefixes     = list(string)
+
+    delegation = optional(object({
+      name         = string
+      service_name = string
+      actions      = list(string)
+    }))
   }))
 }
 
 variable "aks_cluster_x" {
   type = map(object({
 
-    name                = string
-    location            = string
-    resource_group_name = string
-    kubernetes_version  = string
-    dns_prefix          = string
+    name                    = string
+    location                = string
+    resource_group_name     = string
+    kubernetes_version      = string
+    dns_prefix              = string
     private_cluster_enabled = bool
 
     default_node_pool = map(object({
-      name                  = string
-      auto_scaling_enabled  = bool
-      min_count             = number
-      max_count             = number
-      vm_size               = string
+      name                 = string
+      auto_scaling_enabled = bool
+      min_count            = number
+      max_count            = number
+      vm_size              = string
     }))
     network_profile = map(object({
       network_plugin    = string
+      network_plugin_mode = string
       network_policy    = string
       load_balancer_sku = string
     }))
@@ -61,7 +69,7 @@ variable "public_ip_x" {
     sku                 = string
     zones               = optional(list(string))
   }))
-  
+
 }
 variable "bastion-host_x" {
   type = map(object({
@@ -70,11 +78,11 @@ variable "bastion-host_x" {
     resource_group_name  = string
     virtual_network_name = string
     ip_configuration = map(object({
-    name = string
+      name = string
     }))
 
   }))
-  
+
 }
 variable "nic_config_x" {
   type = map(object({
@@ -83,7 +91,7 @@ variable "nic_config_x" {
     resource_group_name = string
     subnet_name         = string
     # public_ip_name      = string
-    ip_configuration    = list(object({
+    ip_configuration = list(object({
       name                          = string
       private_ip_address_allocation = string
     }))
@@ -117,7 +125,7 @@ variable "jumpbox_x" {
 }
 variable "key_vaults_x" {
   description = "Map of Key Vault configurations"
-  type        = map(object({
+  type = map(object({
     name                = string
     resource_group_name = string
     location            = string
@@ -132,13 +140,13 @@ variable "kv_admin_roles_x" {
   type = map(object({
     role_definition_name = string
   }))
-  
+
 }
 
 
 variable "dnszone_x" {
   description = "Map of private DNS zones"
-  type        = map(object({
+  type = map(object({
     name                = string
     resource_group_name = string
   }))
@@ -146,11 +154,11 @@ variable "dnszone_x" {
 
 variable "dnslink_x" {
   description = "Map of DNS zone virtual network links"
-  type        = map(object({
+  type = map(object({
     name                  = string
-    
+    private_dns_zone_name = string
   }))
-  
+
 }
 
 variable "kv_pe_x" {
@@ -172,5 +180,66 @@ variable "kv_pe_x" {
       name                 = string
       private_dns_zone_ids = list(string)
     }))
+  }))
+}
+
+variable "acr_x" {
+  type = map(object({
+    name                = string
+    resource_group_name = string
+    location            = string
+    sku                 = string
+    admin_enabled       = bool
+  }))
+
+}
+
+variable "postgresql_x" {
+  description = "PostgreSQL Flexible Server configuration"
+
+  type = map(object({
+    name                   = string
+    resource_group_name    = string
+    location               = string
+    version                = string
+    administrator_login    = string
+    administrator_password = string
+
+    sku_name              = string
+    storage_mb            = number
+    backup_retention_days = number
+    zone = string
+  }))
+}
+
+variable "postgresql_databases_x" {
+  description = "Map of PostgreSQL databases"
+
+  type = map(object({
+    name       = string
+    server_key = string
+  }))
+}
+
+variable "extensions_x" {
+  description = "Map of PostgreSQL extensions"
+
+  type = map(object({
+    name = string
+    server_key = string
+  }))
+}
+
+variable "dns_resolver_x" {
+  description = "Azure DNS Private Resolver configuration"
+
+  type = map(object({
+    name                = string
+    resource_group_name = string
+    location            = string
+
+    inbound_endpoint = object({
+      name = string
+    })
   }))
 }

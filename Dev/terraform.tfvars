@@ -1,4 +1,4 @@
-rg_name_x = {  
+rg_name_x = {
   "rg1" = {
     name     = "jaydeep_rg2"
     location = "Central india"
@@ -12,7 +12,7 @@ vnet_config_x = {
     location            = "Central india"
     resource_group_name = "jaydeep_rg2"
     address_space       = ["10.10.0.0/16"]
-    
+
   }
 }
 
@@ -23,24 +23,54 @@ subnet_config_x = {
     virtual_network_name = "jaydeep-aks-vnet"
     address_prefixes     = ["10.10.1.0/24"]
   }
-    "bastion_subnet" = {
+  "bastion_subnet" = {
     name                 = "AzureBastionSubnet"
     resource_group_name  = "jaydeep_rg2"
     virtual_network_name = "jaydeep-aks-vnet"
     address_prefixes     = ["10.10.2.0/24"]
   }
-    "jumpbox-subnet" = {
+  "jumpbox-subnet" = {
     name                 = "JumpBoxSubnet"
     resource_group_name  = "jaydeep_rg2"
     virtual_network_name = "jaydeep-aks-vnet"
     address_prefixes     = ["10.10.3.0/24"]
   }
   "GatewaySubnet" = {
-  name                 = "GatewaySubnet"
-  resource_group_name  = "jaydeep_rg2"
-  virtual_network_name = "jaydeep-aks-vnet"
-  address_prefixes     = ["10.10.254.0/27"]
-}
+    name                 = "GatewaySubnet"
+    resource_group_name  = "jaydeep_rg2"
+    virtual_network_name = "jaydeep-aks-vnet"
+    address_prefixes     = ["10.10.254.0/27"]
+  }
+  "postgres_subnet" = {
+    name                 = "PostgreSQLSubnet"
+    resource_group_name  = "jaydeep_rg2"
+    virtual_network_name = "jaydeep-aks-vnet"
+    address_prefixes     = ["10.10.5.0/24"]
+
+    delegation = {
+      name         = "postgresql-delegation"
+      service_name = "Microsoft.DBforPostgreSQL/flexibleServers"
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action"
+      ]
+    }
+  }
+  "dns_resolver_subnet" = {
+    name                 = "DNSResolverSubnet"
+    resource_group_name  = "jaydeep_rg2"
+    virtual_network_name = "jaydeep-aks-vnet"
+    address_prefixes     = ["10.10.4.0/28"]
+
+    delegation = {
+      name         = "dns-resolver-delegation"
+      service_name = "Microsoft.Network/dnsResolvers"
+
+      actions = [
+        "Microsoft.Network/virtualNetworks/subnets/join/action"
+      ]
+    }
+  }
+
 }
 aks_cluster_x = {
 
@@ -50,8 +80,8 @@ aks_cluster_x = {
     location            = "Central india"
     resource_group_name = "jaydeep_rg2"
 
-    kubernetes_version = "1.35.5"
-    dns_prefix         = "jaydeep-aks"
+    kubernetes_version      = "1.35.5"
+    dns_prefix              = "jaydeep-aks"
     private_cluster_enabled = true
 
 
@@ -59,11 +89,11 @@ aks_cluster_x = {
 
       "nodepool1" = {
 
-        name                  = "k8vms"
-        auto_scaling_enabled  = true
-        min_count             = 1
-        max_count             = 4
-        vm_size               = "standard_b2s_v2"
+        name                 = "k8vms"
+        auto_scaling_enabled = true
+        min_count            = 1
+        max_count            = 4
+        vm_size              = "standard_b2s_v2"
       }
     }
 
@@ -73,6 +103,7 @@ aks_cluster_x = {
 
         network_plugin    = "azure"
         network_policy    = "calico"
+        network_plugin_mode = "overlay"
         load_balancer_sku = "standard"
       }
     }
@@ -87,7 +118,7 @@ public_ip_x = {
     sku                 = "Standard"
 
   }
-    "pub-ip_vpn_gateway" = {
+  "pub-ip_vpn_gateway" = {
     name                = "vpn-gateway-public-ip"
     resource_group_name = "jaydeep_rg2"
     location            = "Central india"
@@ -136,8 +167,8 @@ jumpbox_x = {
     disable_password_authentication = false
     os_disk = {
       "osdisk1" = {
-        name    = "jumpbox-osdisk"
-        caching = "ReadWrite"
+        name                 = "jumpbox-osdisk"
+        caching              = "ReadWrite"
         storage_account_type = "Standard_LRS"
         disk_size_gb         = 30
       }
@@ -159,7 +190,7 @@ key_vaults_x = {
     resource_group_name = "jaydeep_rg2"
     location            = "Central india"
     sku_name            = "standard"
-    tenant_id           = "8ec50a22-571a-45d8-a7f3-72b599797c26"  # Replace with your actual tenant ID
+    tenant_id           = "8ec50a22-571a-45d8-a7f3-72b599797c26" # Replace with your actual tenant ID
     tags = {
       environment = "dev"
       project     = "KeyVaultProject"
@@ -168,46 +199,116 @@ key_vaults_x = {
 }
 
 kv_admin_roles_x = {
-  "kv_admin" = { 
+  "kv_admin" = {
     role_definition_name = "Key Vault Administrator"
   }
 }
 
 dnszone_x = {
-   "DNSzone1" = {
+  "DNSzone1" = {
     name                = "privatelink.vaultcore.azure.net"
     resource_group_name = "jaydeep_rg2"
   }
+  "postgresql" = {
+    name                = "privatelink.postgres.database.azure.com"
+    resource_group_name = "jaydeep_rg2"
+  }
+
 }
 
 dnslink_x = {
   "kv" = {
     name                  = "kv-dns-link"
+    private_dns_zone_name = "privatelink.vaultcore.azure.net"
+  }
+
+  "postgresql" = {
+    name                  = "postgresql-dns-link"
+    private_dns_zone_name = "privatelink.postgres.database.azure.com"
   }
 }
 
 kv_pe_x = {
   "kv-pe" = {
-    name                 = "kv-pe"
-    resource_group_name  = "jaydeep_rg2"
+    name                = "kv-pe"
+    resource_group_name = "jaydeep_rg2"
     location            = "Central india"
-    subnet_name          = "aks_subnet"
+    subnet_name         = "aks_subnet"
     key_vault_name      = "jaydeep-key-vault1"
 
     private_service_connection = {
-        "psc1" = {
-      name                           = "kv-privatelink"
-      private_connection_resource_id = "kvi"  # Replace with actual resource ID
-      is_manual_connection          = false
-      subresource_names             = ["vault"]
-    }
+      "psc1" = {
+        name                           = "kv-privatelink"
+        private_connection_resource_id = "kvi" # Replace with actual resource ID
+        is_manual_connection           = false
+        subresource_names              = ["vault"]
+      }
     }
     private_dns_zone_group = {
       "pdzg1" = {
         name                 = "pdzg-kv1"
-        private_dns_zone_ids = ["kv"]  # Replace with actual DNS zone IDs
+        private_dns_zone_ids = ["kv"] # Replace with actual DNS zone IDs
       }
-    
+
+    }
   }
 }
+
+acr_x = {
+  "acr_x" = {
+    name                = "acraxionappjay"
+    resource_group_name = "jaydeep_rg2"
+    location            = "central india"
+    sku                 = "Basic"
+    admin_enabled       = true
+
+  }
+}
+
+postgresql_x = {
+
+  "postgres1" = {
+
+    name                = "jaydeep-postgres-flex"
+    resource_group_name = "jaydeep_rg2"
+    location            = "Central India"
+
+    version = "16"
+
+    administrator_login    = "pgadmin"
+    administrator_password = "Oneday@321"
+
+    sku_name              = "B_Standard_B1ms"
+    storage_mb            = 32768
+    backup_retention_days = 7
+    zone = "2"
+  }
+}
+
+postgresql_databases_x = {
+  "appdb" = {
+    name       = "axion-db"
+    server_key = "postgres1"
+  }
+}
+
+extensions_x = {
+  "pgcrypto" = {
+    name = "azure.extensions"
+    server_key = "postgres1"
+  }
+}
+
+dns_resolver_x = {
+
+  "resolver1" = {
+
+    name                = "jaydeep-dns-resolver"
+    resource_group_name = "jaydeep_rg2"
+    location            = "Central India"
+
+    inbound_endpoint = {
+      name = "dns-resolver-inbound"
+    }
+  }
 }

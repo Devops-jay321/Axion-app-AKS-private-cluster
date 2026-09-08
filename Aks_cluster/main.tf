@@ -46,6 +46,7 @@ resource "azurerm_kubernetes_cluster" "aks" {
     content {
 
       network_plugin    = network_profile.value.network_plugin
+      network_plugin_mode = network_profile.value.network_plugin_mode
       network_policy    = network_profile.value.network_policy
       load_balancer_sku = network_profile.value.load_balancer_sku
 

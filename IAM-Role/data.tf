@@ -15,3 +15,8 @@ data "azurerm_user_assigned_identity" "kv_csi" {
   name                = "azurekeyvaultsecretsprovider-jaydeep-aks-cluster-private"
   resource_group_name = "MC_jaydeep_rg2_jaydeep-aks-cluster-private_centralindia"
 }
+
+data "azurerm_container_registry" "acr" {
+  name                = "acraxionappjay"
+  resource_group_name = "jaydeep_rg2"
+}

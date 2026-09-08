@@ -20,6 +20,7 @@ variable "aks_cluster" {
     network_profile = map(object({
       network_plugin    = string
       network_policy    = string
+      network_plugin_mode = string
       load_balancer_sku = string
     }))
   }))
